@@ -229,6 +229,58 @@
     color: var(--ink-soft);
     opacity:.7;
   }
+
+  .score-badge{
+    position:absolute;
+    top: 16px;
+    right: 18px;
+    background: var(--peach);
+    color: var(--rose-dark);
+    font-weight:700;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    z-index: 2;
+  }
+
+  textarea{
+    width:100%;
+    max-width: 300px;
+    min-height: 90px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    border: 2px solid var(--peach);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 15px;
+    font-weight:600;
+    color: var(--ink);
+    outline:none;
+    resize: none;
+    margin-bottom: 16px;
+    background: var(--cream);
+  }
+  textarea:focus{ border-color: var(--rose); }
+
+  .btn-ghost{
+    background: transparent;
+    color: var(--rose-dark);
+    border: 2px solid var(--peach);
+    padding: 12px 28px;
+    border-radius: 16px;
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size: 15px;
+    cursor:pointer;
+    margin-top: 4px;
+  }
+  .btn-ghost:hover{ background: var(--peach); }
+
+  .sent-msg{
+    color: var(--rose-dark);
+    font-weight:700;
+    font-size: 15px;
+    margin-top: 8px;
+  }
 </style>
 </head>
 <body>
@@ -263,17 +315,38 @@
     <div class="q-count">pergunta 2 de 2</div>
     <div class="question">Você quer ver o Lucas antes de 30 dias?</div>
     <div class="answer-zone">
-      <button class="btn-yes" onclick="goTo('final')">Sim</button>
+      <button class="btn-yes" onclick="startRound()">Sim</button>
       <button class="btn-no" id="no2">Não</button>
     </div>
   </div>
 
-  <!-- TELA FINAL -->
-  <div class="screen hidden" id="screen-final">
-    <div class="final-emoji">🥰</div>
-    <h1>Combinado, então!</h1>
-    <p class="sub">Já quero te ver. bejo na boca, Erica.</p>
-    <footer class="tiny">feito com carinho pra você</footer>
+  <!-- TELA DE RODADA (perguntas com pontos) -->
+  <div class="screen hidden" id="screen-round">
+    <div class="score-badge" id="scoreBadge">0 pts</div>
+    <div class="q-count" id="roundCount">pergunta 1 de 8</div>
+    <div class="question" id="roundQuestion">...</div>
+    <div class="answer-zone" style="height:auto; position:static; display:flex; gap:14px; justify-content:center;">
+      <button class="btn-yes" style="position:static; transform:none;" onclick="answerRound(true)">Sim</button>
+      <button class="btn-yes" style="position:static; transform:none; background:var(--cream); color:var(--ink-soft); border:2px solid var(--peach);" onclick="answerRound(false)">Não</button>
+    </div>
+  </div>
+
+  <!-- TELA DE SUCESSO (pontuação >= 100) -->
+  <div class="screen hidden" id="screen-success">
+    <div class="final-emoji">😏</div>
+    <h1>Passou de <em>100</em>!</h1>
+    <p class="sub">Você fez <strong id="finalScoreSuccess">0</strong> pontos. Já pode fazer um pedido pro Lucas.</p>
+    <textarea id="pedidoInput" placeholder="Escreve seu pedido aqui..."></textarea>
+    <button class="btn-main" onclick="enviarPedido()">Confirmar pedido</button>
+    <div class="sent-msg hidden" id="sentMsg">Agora é só tirar um print dessa tela e me mandar 📸💌</div>
+  </div>
+
+  <!-- TELA DE QUASE LÁ (pontuação < 100) -->
+  <div class="screen hidden" id="screen-retry">
+    <div class="final-emoji">😅</div>
+    <h1>Quase <em>lá</em>!</h1>
+    <p class="sub">Você fez <strong id="finalScoreRetry">0</strong> pontos. Precisa de 100 pra desbloquear o pedido.</p>
+    <button class="btn-main" onclick="startRound()">Tentar de novo</button>
   </div>
 
 </div>
@@ -337,6 +410,81 @@
 
   makeDodgy(document.getElementById('no1'), document.getElementById('no1').parentElement);
   makeDodgy(document.getElementById('no2'), document.getElementById('no2').parentElement);
+
+  // ---- RODADA DE PERGUNTAS COM PONTOS ----
+  // Edita essa lista à vontade: "sim" e "nao" são os pontos que cada resposta vale.
+  const roundQuestions = [
+    { text: "Você ri sozinha lembrando de mim?", sim: 15, nao: 5 },
+    { text: "Se eu aparecesse de surpresa agora, você pularia no meu colo?", sim: 15, nao: 5 },
+    { text: "Você fica com ciúmes quando mexem comigo?", sim: 15, nao: 5 },
+    { text: "Você guarda print das nossas conversas mais safadas?", sim: 15, nao: 5 },
+    { text: "Se eu te chamasse pra dormir agora, você vinha?", sim: 15, nao: 5 },
+    { text: "Você já sonhou algo safado comigo?", sim: 15, nao: 5 },
+    { text: "Você curte quando eu sou atrevido com você?", sim: 15, nao: 5 },
+    { text: "Bora matar a saudade com um encontro chique esse mês?", sim: 15, nao: 5 }
+  ];
+
+  const SCORE_THRESHOLD = 100;
+  let roundIndex = 0;
+  let score = 0;
+
+  function startRound(){
+    roundIndex = 0;
+    score = 0;
+    document.getElementById('sentMsg').classList.add('hidden');
+    document.getElementById('pedidoInput').value = '';
+    document.getElementById('pedidoInput').disabled = false;
+    document.querySelector('#screen-success .btn-main').classList.remove('hidden');
+    updateScoreBadge();
+    renderRoundQuestion();
+    goTo('round');
+  }
+
+  function updateScoreBadge(){
+    document.getElementById('scoreBadge').textContent = score + ' pts';
+  }
+
+  function renderRoundQuestion(){
+    const q = roundQuestions[roundIndex];
+    document.getElementById('roundQuestion').textContent = q.text;
+    document.getElementById('roundCount').textContent =
+      'pergunta ' + (roundIndex + 1) + ' de ' + roundQuestions.length;
+  }
+
+  function answerRound(isYes){
+    const q = roundQuestions[roundIndex];
+    score += isYes ? q.sim : q.nao;
+    updateScoreBadge();
+    roundIndex++;
+    if(roundIndex < roundQuestions.length){
+      renderRoundQuestion();
+      // reanima a pergunta
+      const el = document.getElementById('roundQuestion');
+      el.style.animation = 'none';
+      void el.offsetWidth;
+      el.style.animation = 'rise .3s ease both';
+    } else {
+      finishRound();
+    }
+  }
+
+  function finishRound(){
+    if(score >= SCORE_THRESHOLD){
+      document.getElementById('finalScoreSuccess').textContent = score;
+      goTo('success');
+    } else {
+      document.getElementById('finalScoreRetry').textContent = score;
+      goTo('retry');
+    }
+  }
+
+  function enviarPedido(){
+    const val = document.getElementById('pedidoInput').value.trim();
+    if(!val) return;
+    document.getElementById('pedidoInput').disabled = true;
+    document.querySelector('#screen-success .btn-main').classList.add('hidden');
+    document.getElementById('sentMsg').classList.remove('hidden');
+  }
 </script>
 
 </body>
