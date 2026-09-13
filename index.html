@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Pra Erica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream: #FFF4EF;
+    --card: #FFFFFF;
+    --rose: #D6455D;
+    --rose-dark: #B23350;
+    --peach: #FFD9CC;
+    --ink: #3B2C2C;
+    --ink-soft: #8A7472;
+    --gold: #E3A857;
+  }
+
+  *{ box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+  html,body{
+    margin:0; padding:0; height:100%;
+    background: var(--cream);
+    font-family: 'Quicksand', sans-serif;
+    color: var(--ink);
+    overscroll-behavior: none;
+  }
+
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100vh;
+    padding: 20px;
+  }
+
+  .backdrop-heart{
+    position:fixed;
+    font-size: 90px;
+    color: var(--peach);
+    opacity:.5;
+    user-select:none;
+    pointer-events:none;
+    z-index:0;
+  }
+  .bh1{ top:6%; left:8%; transform: rotate(-12deg); }
+  .bh2{ bottom:8%; right:6%; transform: rotate(10deg); font-size:70px; }
+
+  .card{
+    position:relative;
+    z-index:1;
+    background: var(--card);
+    width:100%;
+    max-width: 400px;
+    min-height: 460px;
+    border-radius: 28px;
+    padding: 40px 28px 32px;
+    box-shadow: 0 20px 50px rgba(178,51,80,0.12);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    overflow:hidden;
+  }
+
+  .screen{
+    width:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    animation: rise .5s ease both;
+  }
+
+  @keyframes rise{
+    from{ opacity:0; transform: translateY(14px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  .hidden{ display:none !important; }
+
+  .eyebrow{
+    font-size: 15px;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+
+  h1{
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 30px;
+    line-height:1.25;
+    margin: 0 0 18px;
+  }
+
+  h1 em{
+    font-style: italic;
+    color: var(--rose);
+  }
+
+  p.sub{
+    color: var(--ink-soft);
+    font-size: 15px;
+    line-height:1.5;
+    margin: 0 0 26px;
+    max-width: 300px;
+  }
+
+  input[type="text"]{
+    width:100%;
+    max-width: 260px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    border: 2px solid var(--peach);
+    font-family: 'Quicksand', sans-serif;
+    font-size: 17px;
+    font-weight:600;
+    color: var(--ink);
+    text-align:center;
+    outline:none;
+    margin-bottom: 16px;
+    background: var(--cream);
+  }
+  input[type="text"]:focus{
+    border-color: var(--rose);
+  }
+
+  .btn-main{
+    background: var(--rose);
+    color: white;
+    border:none;
+    padding: 14px 34px;
+    border-radius: 16px;
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size: 16px;
+    cursor:pointer;
+    transition: transform .15s ease, background .15s ease;
+  }
+  .btn-main:hover{ background: var(--rose-dark); }
+  .btn-main:active{ transform: scale(.96); }
+  .btn-main:focus-visible{ outline: 3px solid var(--gold); outline-offset:2px; }
+
+  .error-msg{
+    color: var(--rose-dark);
+    font-size: 14px;
+    font-weight:600;
+    height: 18px;
+    margin-bottom: 4px;
+  }
+
+  .shake{
+    animation: shake .4s ease;
+  }
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    20%{ transform: translateX(-8px); }
+    40%{ transform: translateX(8px); }
+    60%{ transform: translateX(-6px); }
+    80%{ transform: translateX(6px); }
+  }
+
+  .q-count{
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight:600;
+    margin-bottom: 10px;
+    letter-spacing: .2px;
+  }
+
+  .question{
+    font-family:'Fraunces', serif;
+    font-weight: 500;
+    font-size: 25px;
+    line-height:1.3;
+    margin-bottom: 34px;
+  }
+
+  .answer-zone{
+    position:relative;
+    width:100%;
+    height: 150px;
+  }
+
+  .btn-yes, .btn-no{
+    padding: 14px 30px;
+    border-radius: 16px;
+    font-family:'Quicksand', sans-serif;
+    font-weight:700;
+    font-size: 16px;
+    border: none;
+    cursor:pointer;
+  }
+
+  .btn-yes{
+    background: var(--rose);
+    color:white;
+    position:absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    transition: transform .15s ease, background .15s ease;
+  }
+  .btn-yes:active{ transform: translateX(-50%) scale(.95); }
+  .btn-yes:hover{ background: var(--rose-dark); }
+
+  .btn-no{
+    background: var(--cream);
+    color: var(--ink-soft);
+    border: 2px solid var(--peach);
+    position:absolute;
+    left: 50%;
+    top: 70px;
+    transform: translateX(-50%);
+    transition: left .18s ease, top .18s ease;
+  }
+
+  .final-emoji{
+    font-size: 54px;
+    margin-bottom: 14px;
+  }
+
+  footer.tiny{
+    margin-top: 22px;
+    font-size: 12px;
+    color: var(--ink-soft);
+    opacity:.7;
+  }
+</style>
+</head>
+<body>
+
+<div class="backdrop-heart bh1">♥</div>
+<div class="backdrop-heart bh2">♥</div>
+
+<div class="card" id="card">
+
+  <!-- TELA 1: PORTA DE ENTRADA -->
+  <div class="screen" id="screen-gate">
+    <div class="eyebrow">um site só pra</div>
+    <h1>Oi, <em>vida</em> 💗</h1>
+    <p class="sub">Esse cantinho é só seu. Digita seu nome pra entrar.</p>
+    <input type="text" id="nameInput" placeholder="Seu nome" autocomplete="off">
+    <div class="error-msg" id="errorMsg"></div>
+    <button class="btn-main" onclick="tryEnter()">Entrar</button>
+  </div>
+
+  <!-- TELA 2: PERGUNTA 1 -->
+  <div class="screen hidden" id="screen-q1">
+    <div class="q-count">pergunta 1 de 2</div>
+    <div class="question">Você beijaria o Lucas agora?</div>
+    <div class="answer-zone">
+      <button class="btn-yes" onclick="goTo('q2')">Sim</button>
+      <button class="btn-no" id="no1">Não</button>
+    </div>
+  </div>
+
+  <!-- TELA 3: PERGUNTA 2 -->
+  <div class="screen hidden" id="screen-q2">
+    <div class="q-count">pergunta 2 de 2</div>
+    <div class="question">Você quer ver o Lucas antes de 30 dias?</div>
+    <div class="answer-zone">
+      <button class="btn-yes" onclick="goTo('final')">Sim</button>
+      <button class="btn-no" id="no2">Não</button>
+    </div>
+  </div>
+
+  <!-- TELA FINAL -->
+  <div class="screen hidden" id="screen-final">
+    <div class="final-emoji">🥰</div>
+    <h1>Combinado, então!</h1>
+    <p class="sub">Já quero te ver. bejo na boca, Erica.</p>
+    <footer class="tiny">feito com carinho pra você</footer>
+  </div>
+
+</div>
+
+<script>
+  function normalize(str){
+    return str
+      .trim()
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
+  }
+
+  function tryEnter(){
+    const val = document.getElementById('nameInput').value;
+    if(normalize(val) === 'erica'){
+      goTo('q1');
+    } else {
+      const err = document.getElementById('errorMsg');
+      const card = document.getElementById('card');
+      err.textContent = 'Hmm, esse nome não é seu 💭';
+      card.classList.remove('shake');
+      void card.offsetWidth;
+      card.classList.add('shake');
+    }
+  }
+
+  document.getElementById('nameInput').addEventListener('keydown', function(e){
+    if(e.key === 'Enter') tryEnter();
+  });
+
+  function goTo(id){
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    const target = document.getElementById('screen-' + id);
+    target.classList.remove('hidden');
+    // restart entrance animation
+    target.style.animation = 'none';
+    void target.offsetWidth;
+    target.style.animation = '';
+  }
+
+  // Botão "Não" foge do cursor/toque
+  function makeDodgy(btn, zone){
+    function dodge(){
+      const zw = zone.clientWidth;
+      const zh = zone.clientHeight;
+      const bw = btn.offsetWidth;
+      const bh = btn.offsetHeight;
+      const maxLeft = zw - bw;
+      const maxTop = zh - bh;
+      const newLeft = Math.random() * maxLeft;
+      const newTop = Math.random() * maxTop;
+      btn.style.left = newLeft + 'px';
+      btn.style.top = newTop + 'px';
+      btn.style.transform = 'none';
+    }
+    btn.addEventListener('pointerenter', dodge);
+    btn.addEventListener('pointerdown', function(e){ e.preventDefault(); dodge(); });
+    btn.addEventListener('touchstart', function(e){ e.preventDefault(); dodge(); }, {passive:false});
+  }
+
+  makeDodgy(document.getElementById('no1'), document.getElementById('no1').parentElement);
+  makeDodgy(document.getElementById('no2'), document.getElementById('no2').parentElement);
+</script>
+
+</body>
+</html>
