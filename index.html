@@ -211,16 +211,56 @@ const roundQuestions=[
  {text:"Você curte quando eu sou atrevido com você?",sim:30,nao:5},
  {text:"Bora matar a saudade com um encontro chique esse mês?",sim:20,nao:5}
 ];
+
+  const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwxlEiO1F8E_S4knOINb-CvE6fQW6BZTiBbgK_Nav4nICoveqoCyDi21lY4NkRbYA/exec';
+
+  async function enviarParaSheets(dados) {
+  try {
+    await fetch(SHEETS_URL, {
+      method: 'POST',
+      redirect: 'follow',
+      headers: {
+        'Content-Type': 'text/plain;charset=utf-8'
+      },
+      body: JSON.stringify(dados)
+    });
+  } catch (erro) {
+    console.error('Erro ao salvar no Google Sheets:', erro);
+  }
+}
+
+
 const SCORE_THRESHOLD=100;
 
 function loadData(){
  try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{sessionStarted:new Date().toISOString(),answers:[]}}
  catch(e){return{sessionStarted:new Date().toISOString(),answers:[]}}
 }
+
 function persist(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data))}
-function record(type,question,answer,extra={}){
- data.answers.push({type,question,answer,at:new Date().toISOString(),...extra}); persist();
+function record(type, question, answer, extra = {}) {
+  const resposta = {
+    type,
+    question,
+    answer,
+    at: new Date().toISOString(),
+    ...extra
+  };
+
+  data.answers.push(resposta);
+
+  persist();
+
+  enviarParaSheets({
+    nome: 'Erica',
+    pergunta: question,
+    resposta: answer,
+    pontos: extra.points || '',
+    tipo: type,
+    pontuacaoFinal: score || ''
+  });
 }
+
 function normalize(str){return str.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 function tryEnter(){
  const raw=document.getElementById('nameInput').value, val=normalize(raw), err=document.getElementById('errorMsg');
