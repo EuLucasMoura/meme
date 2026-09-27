@@ -662,45 +662,54 @@ function downloadAnswers(){
  const url=URL.createObjectURL(blob),a=document.createElement('a');
  a.href=url;a.download='respostas-erica.json';document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
 }
-let taps=0,timer=null;
-function adminTap(){
- taps++;clearTimeout(timer);timer=setTimeout(()=>taps=0,1200);
- if(taps>=5){
-   const saved=localStorage.getItem(STORAGE_KEY);
-   alert(saved?'Respostas salvas neste aparelho. Abra o resumo ao final para exportar.':'Ainda não há respostas salvas.');
-   taps=0;
- }
+
+let taps = 0;
+let timer = null;
+
+function adminTap() {
+
+  taps++;
+
+  clearTimeout(timer);
+
+  timer = setTimeout(() => {
+    taps = 0;
+  }, 1200);
+
+  if (taps >= 5) {
+
+    const saved = localStorage.getItem(STORAGE_KEY);
+
+    alert(
+      saved
+        ? 'Respostas salvas neste aparelho. Abra o resumo ao final para exportar.'
+        : 'Ainda não há respostas salvas.'
+    );
+
+    taps = 0;
+  }
+}
+
 
 function submitTextAnswer() {
 
   const q = roundQuestions[roundIndex];
 
-  const input =
-    document.getElementById('textAnswer');
+  const input = document.getElementById('textAnswer');
 
-  const answer =
-    input.value.trim();
-
+  const answer = input.value.trim();
 
   if (!answer) {
-
     input.focus();
-
     return;
-
   }
-
 
   answerRound(
     answer,
     q.points || 15
   );
-
 }
 
-
-
-}
 </script>
 </body>
 </html>
