@@ -210,15 +210,129 @@ const STORAGE_KEY='ericaQuizDataV2';
 let data = loadData();
 let roundIndex=0, score=0, pendingAchievement=false, favoriteAsked=false;
 
-const roundQuestions=[
- {text:"Você ri sozinha lembrando de mim?",sim:25,nao:5},
- {text:"Se eu aparecesse de surpresa agora, você pularia no meu colo?",sim:25,nao:5},
- {text:"Você fica com ciúmes quando mexem comigo?",sim:25,nao:5,achievementYes:["Minha possessiva ❤️","Diagnóstico confirmado com sucesso."]},
- {text:"Você assopraria minha boca de novo?",sim:25,nao:5,achievementYes:["Eu sabia 😏","Algumas tradições precisam ser mantidas."]},
- {text:"Se eu te chamasse pra viajar comigo, você iria?",sim:40,nao:5,achievementYes:["Primeira viagem pendente ✈️","Essa resposta foi devidamente registrada."]},
- {text:"Você dormiria comigo fazendo massagem no seu ombro esquerdo dolorido?",sim:25,nao:5},
- {text:"Você curte quando eu sou atrevido com você?",sim:30,nao:5},
- {text:"Bora matar a saudade com um encontro chique esse mês?",sim:20,nao:5}
+const roundQuestions = [
+
+  {
+    type: 'text',
+    text: 'Qual foi sua primeira impressão de mim?',
+    points: 15
+  },
+
+  {
+    type: 'text',
+    text: 'E qual é sua impressão de mim hoje?',
+    points: 15
+  },
+
+  {
+    type: 'choice',
+    text: 'Qual desses momentos você repetiria primeiro?',
+    options: [
+      { label: '🎬 Cinema', points: 20 },
+      { label: '⚽ Jogo', points: 20 },
+      { label: '🛏️ Fim de semana juntos', points: 20 },
+      { label: '🚿 Aquele banho 👀', points: 25 }
+    ]
+  },
+
+  {
+    type: 'choice',
+    text: 'Qual versão minha você prefere?',
+    options: [
+      { label: '🥰 Fofo', points: 20 },
+      { label: '😂 Engraçado', points: 20 },
+      { label: '😏 Atrevido', points: 25 },
+      { label: '😌 Quietinho', points: 20 }
+    ]
+  },
+
+  {
+    type: 'yesno',
+    text: 'Você sente saudade de mim mais do que admite?',
+    yesPoints: 25,
+    noPoints: 10
+  },
+
+  {
+    type: 'choice',
+    text: 'Qual seria nosso date perfeito hoje?',
+    options: [
+      { label: '🍷 Restaurante', points: 20 },
+      { label: '🎬 Cinema', points: 20 },
+      { label: '🏠 Ficar em casa', points: 20 },
+      { label: '🗺️ Conhecer um lugar novo', points: 25 }
+    ]
+  },
+
+  {
+    type: 'text',
+    text: 'Qual mania minha você já percebeu?',
+    points: 15
+  },
+
+  {
+    type: 'text',
+    text: 'Tem alguma coisa que eu faço que você acha especialmente carinhosa?',
+    points: 15
+  },
+
+  {
+    type: 'choice',
+    text: 'Quem é mais teimoso?',
+    options: [
+      { label: 'Lucas', points: 15 },
+      { label: 'Erica', points: 15 },
+      { label: 'Os dois igualmente 😂', points: 20 }
+    ]
+  },
+
+  {
+    type: 'choice',
+    text: 'Você acha que eu respeito seu espaço?',
+    options: [
+      { label: 'Sim ❤️', points: 25 },
+      { label: 'Na maioria das vezes', points: 20 },
+      { label: 'Às vezes', points: 15 },
+      { label: 'Ainda pode melhorar 👀', points: 15 }
+    ]
+  },
+
+  {
+    type: 'text',
+    text: 'Se tivesse que definir nosso lance em uma palavra, qual seria?',
+    points: 20
+  },
+
+  {
+    type: 'text',
+    text: 'Qual momento nosso você acha que eu nunca deveria esquecer?',
+    points: 25
+  },
+
+  {
+    type: 'choice',
+    text: 'Se eu falasse "arruma uma mochila que a gente vai sair", você preferia...',
+    options: [
+      { label: '✈️ Viajar', points: 25 },
+      { label: '🍽️ Comer em algum lugar diferente', points: 20 },
+      { label: '🎟️ Ir para algum evento', points: 20 },
+      { label: '🎲 Não saber e descobrir na hora', points: 30 }
+    ]
+  },
+
+  {
+    type: 'text',
+    text: 'Tem alguma coisa que você ainda quer muito fazer comigo?',
+    points: 25
+  },
+
+  {
+    type: 'yesno',
+    text: 'Você acha que ainda temos muita coisa pra viver juntos?',
+    yesPoints: 30,
+    noPoints: 5
+  }
+
 ];
 
   const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbwxlEiO1F8E_S4knOINb-CvE6fQW6BZTiBbgK_Nav4nICoveqoCyDi21lY4NkRbYA/exec';
@@ -306,7 +420,7 @@ function makeDodgy(btn,zone){
  btn.addEventListener('pointerdown',e=>{e.preventDefault();dodge()});
  btn.addEventListener('touchstart',e=>{e.preventDefault();dodge()},{passive:false});
 }
-makeDodgy(document.getElementById('no1'),document.getElementById('no1').parentElement);
+makeDodgy(document.getElementById('no1'),document.getElementById('no1').parentElement); 
 makeDodgy(document.getElementById('no2'),document.getElementById('no2').parentElement);
 
 function saveQuick(q,a){record('abertura',q,a)}
@@ -319,32 +433,188 @@ function showMemory(which){
  }
  goTo('memory');
 }
-function startRound(){
- roundIndex=0;score=0;pendingAchievement=false;favoriteAsked=false;
- data.answers=data.answers.filter(a=>a.type!=='rodada'&&a.type!=='especial'&&a.type!=='proximo-capitulo'&&a.type!=='pedido');
- persist(); updateScoreBadge(); renderRoundQuestion(); goTo('round');
+
+function startRound() {
+
+  roundIndex = 0;
+
+  score = 0;
+
+
+  data.answers = data.answers.filter(
+    a =>
+      a.type !== 'rodada' &&
+      a.type !== 'proximo-capitulo' &&
+      a.type !== 'pedido'
+  );
+
+
+  persist();
+
+  updateScoreBadge();
+
+  renderRoundQuestion();
+
+  goTo('round');
+
 }
+
 function updateScoreBadge(){document.getElementById('scoreBadge').textContent=score+' pts'}
-function renderRoundQuestion(){
- const q=roundQuestions[roundIndex];
- document.getElementById('roundQuestion').textContent=q.text;
- document.getElementById('roundCount').textContent='pergunta '+(roundIndex+1)+' de '+roundQuestions.length;
+
+function renderRoundQuestion() {
+
+  const q = roundQuestions[roundIndex];
+
+  document.getElementById('roundQuestion').textContent = q.text;
+
+  document.getElementById('roundCount').textContent =
+    'pergunta ' +
+    (roundIndex + 1) +
+    ' de ' +
+    roundQuestions.length;
+
+  const area = document.getElementById('roundAnswers');
+
+  area.innerHTML = '';
+
+
+
+  // -------------------------
+  // SIM / NÃO
+  // -------------------------
+
+  if (q.type === 'yesno') {
+
+    area.innerHTML = `
+      <div class="row">
+
+        <button
+          class="btn-main"
+          onclick="answerRound('Sim', ${q.yesPoints})">
+          Sim
+        </button>
+
+        <button
+          class="btn-soft"
+          onclick="answerRound('Não', ${q.noPoints})">
+          Não
+        </button>
+
+      </div>
+    `;
+
+  }
+
+
+
+  // -------------------------
+  // MÚLTIPLA ESCOLHA
+  // -------------------------
+
+  else if (q.type === 'choice') {
+
+    const grid = document.createElement('div');
+
+    grid.className = 'choice-grid';
+
+
+    q.options.forEach(option => {
+
+      const button = document.createElement('button');
+
+      button.className = 'choice-btn';
+
+      button.textContent = option.label;
+
+      button.onclick = () => {
+
+        answerRound(
+          option.label,
+          option.points
+        );
+
+      };
+
+      grid.appendChild(button);
+
+    });
+
+
+    area.appendChild(grid);
+
+  }
+
+
+
+  // -------------------------
+  // RESPOSTA ESCRITA
+  // -------------------------
+
+  else if (q.type === 'text') {
+
+    area.innerHTML = `
+
+      <textarea
+        id="textAnswer"
+        placeholder="Escreve aqui..."
+        maxlength="500">
+      </textarea>
+
+      <button
+        class="btn-main"
+        onclick="submitTextAnswer()">
+
+        Responder
+
+      </button>
+
+    `;
+
+  }
+
 }
-function answerRound(isYes){
- const q=roundQuestions[roundIndex],pts=isYes?q.sim:q.nao;
- score+=pts;record('rodada',q.text,isYes?'Sim':'Não',{points:pts,totalAfter:score});updateScoreBadge();
- const achievement=isYes&&q.achievementYes?q.achievementYes:null;
- roundIndex++;
- if(achievement){
-   document.getElementById('achievementTitle').textContent=achievement[0];
-   document.getElementById('achievementText').textContent=achievement[1];
-   pendingAchievement=true;goTo('achievement');return;
- }
- proceedRound();
+
+function answerRound(answer, points) {
+
+  const q = roundQuestions[roundIndex];
+
+  score += points;
+
+
+  record(
+    'rodada',
+    q.text,
+    answer,
+    {
+      points: points,
+      totalAfter: score,
+      questionType: q.type
+    }
+  );
+
+
+  updateScoreBadge();
+
+
+  roundIndex++;
+
+
+  if (roundIndex < roundQuestions.length) {
+
+    renderRoundQuestion();
+
+    goTo('round');
+
+  } else {
+
+    finishRound();
+
+  }
+
 }
+
 function continueAfterAchievement(){pendingAchievement=false;proceedRound()}
 function proceedRound(){
- if(roundIndex===4 && !favoriteAsked){favoriteAsked=true;goTo('favorite');return}
  if(roundIndex<roundQuestions.length){renderRoundQuestion();goTo('round')}
  else finishRound();
 }
@@ -400,6 +670,36 @@ function adminTap(){
    alert(saved?'Respostas salvas neste aparelho. Abra o resumo ao final para exportar.':'Ainda não há respostas salvas.');
    taps=0;
  }
+
+function submitTextAnswer() {
+
+  const q = roundQuestions[roundIndex];
+
+  const input =
+    document.getElementById('textAnswer');
+
+  const answer =
+    input.value.trim();
+
+
+  if (!answer) {
+
+    input.focus();
+
+    return;
+
+  }
+
+
+  answerRound(
+    answer,
+    q.points || 15
+  );
+
+}
+
+
+
 }
 </script>
 </body>
