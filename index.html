@@ -237,6 +237,10 @@ function loadData(){
  catch(e){return{sessionStarted:new Date().toISOString(),answers:[]}}
 }
 
+const SESSION_ID =
+  crypto.randomUUID?.() ||
+  'sessao-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+
 function persist(){localStorage.setItem(STORAGE_KEY,JSON.stringify(data))}
 function record(type, question, answer, extra = {}) {
   const resposta = {
@@ -252,6 +256,7 @@ function record(type, question, answer, extra = {}) {
   persist();
 
   enviarParaSheets({
+    sessionId: SESSION_ID,
     nome: 'Erica',
     pergunta: question,
     resposta: answer,
@@ -270,7 +275,7 @@ function tryEnter(){
   'amor':'Gostei dessa resposta. Mas é melhor usar seu nome Erica 😏',
   'vida': 'Tá carinhosa em hoje, hein? 💖',
  };
- 
+
  if(val==='erica'){record('entrada','Nome digitado',raw);goTo('q1')}
  else{
    err.textContent=easter[val]||'Hmm, esse nome não é seu 💭';
