@@ -97,12 +97,18 @@ input:focus,textarea:focus{border-color:var(--rose)}
 </head>
 <body>
 
-<audio id="bgMusic" loop>
-  <source src="/music/sonhacomigo.mp3" type="audio/mpeg">
+<audio
+  id="bgMusic"
+  src="/music/sonhacomigo.mp3"
+  preload="auto"
+  loop>
 </audio>
 
-<button id="musicButton" class="music-button" onclick="toggleMusic()">
-  🔊
+<button
+  id="musicButton"
+  class="music-button"
+  onclick="toggleMusic()">
+  🔇
 </button>
 
 <div class="backdrop-heart bh1">♥</div><div class="backdrop-heart bh2">♥</div>
@@ -240,64 +246,85 @@ input:focus,textarea:focus{border-color:var(--rose)}
 const music = document.getElementById('bgMusic');
 const musicButton = document.getElementById('musicButton');
 
-let musicPlaying = false;
 let fadeInterval = null;
 
-function fadeInMusic(targetVolume = 0.50, duration = 2500) {
+
+// Atualiza o botão conforme o estado REAL do áudio
+music.addEventListener('play', () => {
+  musicButton.textContent = '🔊';
+});
+
+music.addEventListener('pause', () => {
+  musicButton.textContent = '🔇';
+});
+
+music.addEventListener('error', () => {
+  musicButton.textContent = '❌';
+  console.error('Erro no áudio:', music.error);
+});
+
+
+function startMusic() {
 
   clearInterval(fadeInterval);
 
   music.volume = 0;
 
-  music.play()
-    .then(() => {
+  const promise = music.play();
 
-      musicPlaying = true;
-      musicButton.textContent = '🔊';
+  if (promise !== undefined) {
 
-      const stepTime = 50;
-      const steps = duration / stepTime;
-      const volumeStep = targetVolume / steps;
+    promise
+      .then(() => {
 
-      fadeInterval = setInterval(() => {
+        console.log('Música iniciou');
 
-        if (music.volume < targetVolume) {
+        const targetVolume = 0.30;
+        const duration = 3000;
+        const stepTime = 50;
 
-          music.volume = Math.min(
-            music.volume + volumeStep,
-            targetVolume
-          );
+        const steps = duration / stepTime;
+        const volumeStep = targetVolume / steps;
 
-        } else {
+        fadeInterval = setInterval(() => {
 
-          clearInterval(fadeInterval);
-        }
+          if (music.volume + volumeStep >= targetVolume) {
 
-      }, stepTime);
+            music.volume = targetVolume;
+            clearInterval(fadeInterval);
 
-    })
-    .catch(() => {
+          } else {
 
-      musicPlaying = false;
-      musicButton.textContent = '🔇';
+            music.volume += volumeStep;
 
-    });
+          }
+
+        }, stepTime);
+
+      })
+
+      .catch((erro) => {
+
+        console.error('Não foi possível iniciar:', erro);
+
+        musicButton.textContent = '🔇';
+
+      });
+  }
 }
+
 
 function toggleMusic() {
 
-  if (musicPlaying) {
+  if (music.paused) {
+
+    startMusic();
+
+  } else {
 
     clearInterval(fadeInterval);
 
     music.pause();
-
-    musicButton.textContent = '🔇';
-    musicPlaying = false;
-
-  } else {
-
-    fadeInMusic(0.25, 1500);
 
   }
 }
@@ -486,27 +513,47 @@ function record(type, question, answer, extra = {}) {
 
 function normalize(str){return str.trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 function tryEnter(){
- const raw=document.getElementById('nameInput').value, val=normalize(raw), err=document.getElementById('errorMsg');
- const easter={
-  'taurina':'Também aceito. Infelizmente. 🐂❤️',
-  'minha possessiva':'Identidade confirmada imediatamente. 😂',
-  'amor':'Gostei da resposta 😏 mas tenta seu nome de verdade.',
-  'vida': 'Tá carinhosa em hoje, hein? 💖',
- };
 
-if(val === 'erica'){
+  const raw = document.getElementById('nameInput').value;
+  const val = normalize(raw);
+  const err = document.getElementById('errorMsg');
 
-  record('entrada','Nome digitado',raw);
+  const easter = {
+    'taurina':'Também aceito. Infelizmente. 🐂❤️',
+    'minha possessiva':'Identidade confirmada imediatamente. 😂',
+    'amor':'Gostei da resposta 😏 mas tenta seu nome de verdade.',
+    'vida':'Tá carinhosa hoje, hein? 💖'
+  };
 
-  fadeInMusic(0.25, 3000);
+  if(val === 'erica'){
 
-  goTo('q1');
-}
+    startMusic();
 
- else{
-   err.textContent=easter[val]||'Hmm, esse nome não é seu 💭';
-   const card=document.getElementById('card');card.animate([{transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:350});
- }
+    record(
+      'entrada',
+      'Nome digitado',
+      raw
+    );
+
+    goTo('q1');
+
+  } else {
+
+    err.textContent =
+      easter[val] || 'Hmm, esse nome não é seu 💭';
+
+    const card = document.getElementById('card');
+
+    card.animate(
+      [
+        {transform:'translateX(0)'},
+        {transform:'translateX(-8px)'},
+        {transform:'translateX(8px)'},
+        {transform:'translateX(0)'}
+      ],
+      {duration:350}
+    );
+  }
 }
 document.getElementById('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter')tryEnter()});
 function goTo(id){
