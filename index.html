@@ -22,6 +22,28 @@ body{display:flex;align-items:center;justify-content:center;min-height:100vh;pad
   border-radius:28px;padding:38px 26px 30px;box-shadow:0 20px 50px rgba(178,51,80,.12);
   display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:hidden
 }
+
+.music-button{
+  position:fixed;
+  top:16px;
+  right:16px;
+  z-index:10;
+
+  width:44px;
+  height:44px;
+
+  border:none;
+  border-radius:50%;
+
+  background:white;
+  color:var(--rose-dark);
+
+  font-size:20px;
+  cursor:pointer;
+
+  box-shadow:0 8px 20px rgba(178,51,80,.15);
+}
+
 .screen{width:100%;display:flex;flex-direction:column;align-items:center;animation:rise .45s ease both}
 .hidden{display:none!important}
 @keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
@@ -74,6 +96,15 @@ input:focus,textarea:focus{border-color:var(--rose)}
 </style>
 </head>
 <body>
+
+<audio id="bgMusic" loop>
+  <source src="/music/sonhacomigo.mp3" type="audio/mpeg">
+</audio>
+
+<button id="musicButton" class="music-button" onclick="toggleMusic()">
+  🔊
+</button>
+
 <div class="backdrop-heart bh1">♥</div><div class="backdrop-heart bh2">♥</div>
 
 <div class="card" id="card">
@@ -206,6 +237,77 @@ input:focus,textarea:focus{border-color:var(--rose)}
 <div class="admin" onclick="adminTap()">·</div>
 
 <script>
+
+const music = document.getElementById('bgMusic');
+let musicPlaying = false;
+let fadeInterval = null;
+
+function fadeInMusic(targetVolume = 0.25, duration = 2500) {
+
+  clearInterval(fadeInterval);
+
+  music.volume = 0;
+
+  music.play()
+    .then(() => {
+
+      musicPlaying = true;
+      musicButton.textContent = '🔊';
+
+      const stepTime = 50;
+      const steps = duration / stepTime;
+      const volumeStep = targetVolume / steps;
+
+      fadeInterval = setInterval(() => {
+
+        if (music.volume < targetVolume) {
+
+          music.volume = Math.min(
+            music.volume + volumeStep,
+            targetVolume
+          );
+
+        } else {
+
+          clearInterval(fadeInterval);
+
+        }
+
+      }, stepTime);
+
+    })
+    .catch(() => {
+
+      musicPlaying = false;
+      musicButton.textContent = '🔇';
+
+    });
+
+}
+
+const musicButton = document.getElementById('musicButton');
+
+function toggleMusic() {
+
+  if (musicPlaying) {
+
+    music.pause();
+
+    musicButton.textContent = '🔇';
+
+    musicPlaying = false;
+
+  } else {
+
+    music.play();
+
+    musicButton.textContent = '🔊';
+
+    musicPlaying = true;
+
+  }
+}
+
 const STORAGE_KEY='ericaQuizDataV2';
 let data = loadData();
 let roundIndex=0, score=0, pendingAchievement=false, favoriteAsked=false;
@@ -395,11 +497,19 @@ function tryEnter(){
  const easter={
   'taurina':'Também aceito. Infelizmente. 🐂❤️',
   'minha possessiva':'Identidade confirmada imediatamente. 😂',
-  'amor':'Gostei dessa resposta. Mas é melhor usar seu nome Erica 😏',
+  'amor':'Gostei da resposta 😏 mas tenta seu nome de verdade.',
   'vida': 'Tá carinhosa em hoje, hein? 💖',
  };
 
- if(val==='erica'){record('entrada','Nome digitado',raw);goTo('q1')}
+if(val === 'erica'){
+
+  record('entrada','Nome digitado',raw);
+
+  fadeInMusic(0.25, 3000);
+
+  goTo('q1');
+}
+
  else{
    err.textContent=easter[val]||'Hmm, esse nome não é seu 💭';
    const card=document.getElementById('card');card.animate([{transform:'translateX(0)'},{transform:'translateX(-8px)'},{transform:'translateX(8px)'},{transform:'translateX(0)'}],{duration:350});
