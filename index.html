@@ -267,8 +267,10 @@ function tryEnter(){
  const easter={
   'taurina':'Também aceito. Infelizmente. 🐂❤️',
   'minha possessiva':'Identidade confirmada imediatamente. 😂',
-  'amor':'Hmm… essa resposta vai gerar discussão. Digita Erica 😏'
+  'amor':'Gostei dessa resposta. Mas é melhor usar seu nome Erica 😏',
+  'vida': 'Tá carinhosa em hoje, hein? 💖',
  };
+ 
  if(val==='erica'){record('entrada','Nome digitado',raw);goTo('q1')}
  else{
    err.textContent=easter[val]||'Hmm, esse nome não é seu 💭';
