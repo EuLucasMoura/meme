@@ -114,15 +114,24 @@ input:focus,textarea:focus{border-color:var(--rose)}
     <button class="btn-main" id="memoryNext">Continuar</button>
   </div>
 
-  <div class="screen hidden" id="screen-round">
-    <div class="score-badge" id="scoreBadge">0 pts</div>
-    <div class="q-count" id="roundCount">pergunta 1 de 8</div>
-    <div class="question" id="roundQuestion">...</div>
-    <div class="row">
-      <button class="btn-main" onclick="answerRound(true)">Sim</button>
-      <button class="btn-soft" onclick="answerRound(false)">Não</button>
+    <div class="screen hidden" id="screen-round">
+
+    <div class="score-badge" id="scoreBadge">
+        0 pts
     </div>
-  </div>
+
+    <div class="q-count" id="roundCount">
+        pergunta
+    </div>
+
+    <div class="question" id="roundQuestion">
+        ...
+    </div>
+
+    <div id="roundAnswers" style="width:100%;">
+    </div>
+
+    </div>
 
   <div class="screen hidden" id="screen-achievement">
     <div class="eyebrow">conquista desbloqueada 🏆</div>
