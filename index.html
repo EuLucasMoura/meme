@@ -237,8 +237,9 @@ input:focus,textarea:focus{border-color:var(--rose)}
 <div class="admin" onclick="adminTap()">·</div>
 
 <script>
-
 const music = document.getElementById('bgMusic');
+const musicButton = document.getElementById('musicButton');
+
 let musicPlaying = false;
 let fadeInterval = null;
 
@@ -270,7 +271,6 @@ function fadeInMusic(targetVolume = 0.25, duration = 2500) {
         } else {
 
           clearInterval(fadeInterval);
-
         }
 
       }, stepTime);
@@ -282,32 +282,25 @@ function fadeInMusic(targetVolume = 0.25, duration = 2500) {
       musicButton.textContent = '🔇';
 
     });
-
 }
-
-const musicButton = document.getElementById('musicButton');
 
 function toggleMusic() {
 
   if (musicPlaying) {
 
+    clearInterval(fadeInterval);
+
     music.pause();
 
     musicButton.textContent = '🔇';
-
     musicPlaying = false;
 
   } else {
 
-    music.play();
-
-    musicButton.textContent = '🔊';
-
-    musicPlaying = true;
+    fadeInMusic(0.25, 1500);
 
   }
 }
-
 const STORAGE_KEY='ericaQuizDataV2';
 let data = loadData();
 let roundIndex=0, score=0, pendingAchievement=false, favoriteAsked=false;
